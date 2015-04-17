@@ -10,6 +10,10 @@
 
   <name>todo-mvc</name>
 
+  <properties>
+    <view.engine>jsp</view.engine>
+  </properties>
+
   <build>
     <finalName>todo-mvc</finalName>
 
@@ -32,11 +36,45 @@
         <configuration>
           <webApp>
             <contextPath>/${project.build.finalName}</contextPath>
+            <!-- Use filtered web.xml -->
+            <descriptor>${project.basedir}/target/jetty-resources/web.xml</descriptor>
           </webApp>
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>src/main/webapp</directory>
+              <includes>
+                <include>**/web.xml</include>
+              </includes>
+            </resource>
+          </webResources>
+          <warSourceDirectory>src/main/webapp</warSourceDirectory>
+          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+        </configuration>
+      </plugin>
+
     </plugins>
+
+    <resources>
+      <resource>
+        <directory>src/main/webapp/WEB-INF</directory>
+        <filtering>true</filtering>
+        <targetPath>${project.basedir}/target/jetty-resources</targetPath>
+        <includes>
+          <include>web.xml</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
 
   </build>
 
@@ -110,6 +148,46 @@
       <version>1.4.0</version>
     </dependency>
 
+    <!-- Trimou view engine -->
+    <dependency>
+      <groupId>org.trimou</groupId>
+      <artifactId>trimou-extension-servlet</artifactId>
+      <version>1.7.3.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.trimou</groupId>
+      <artifactId>trimou-extension-cdi</artifactId>
+      <version>1.7.3.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.spec.javax.servlet</groupId>
+      <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+      <version>1.0.0.Final</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.2</version>
+    </dependency>
+
   </dependencies>
+
+  <profiles>
+
+    <profile>
+      <id>trimou</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>trimou</name>
+        </property>
+      </activation>
+      <properties>
+        <view.engine>trimou</view.engine>
+      </properties>
+    </profile>
+
+  </profiles>
 
 </project>

@@ -1,14 +1,20 @@
 package de.chkal.todo.web;
 
-import de.chkal.todo.service.TodoItem;
-import de.chkal.todo.service.TodoService;
-
 import javax.inject.Inject;
 import javax.mvc.Controller;
 import javax.mvc.Models;
 import javax.mvc.validation.ValidationResult;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.ws.rs.BeanParam;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+
+import de.chkal.todo.service.TodoItem;
+import de.chkal.todo.service.TodoService;
 
 /**
  * A simple MVC controller.
@@ -28,6 +34,9 @@ public class TodoListController {
   @Inject
   private TodoService todoService;
 
+  @Context
+  private HttpServletRequest request;
+
   /**
    * Executed when the user navigates to the page. The method uses MVC's Models
    * class to populates the model with all data required by the view.
@@ -36,6 +45,11 @@ public class TodoListController {
   @Controller
   public String listItems() {
     models.put("items", todoService.getItems());
+    // This is just an ugly workaround to switch to Trimou if desired
+    String viewEngine = request.getServletContext().getInitParameter("de.chkal.todo.viewEngine");
+    if(viewEngine != null) {
+        return "items." + viewEngine;
+    }
     return "items.jsp";
   }
 
